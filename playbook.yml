@@ -1,0 +1,38 @@
+# File: playbook.yml
+---
+- name: Install and configure Apache on GCP instances
+  hosts: localhost
+  connection: local
+  become: yes
+
+  tasks:
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Apache2 package
+      apt:
+        name: apache2
+        state: present
+
+    - name: Ensure Apache2 service is started and enabled
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Create a simple index.html for testing
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head><title>Hello from GCP MIG</title></head>
+          <body>
+            <h1>Success! Apache is running.</h1>
+            <p>Hostname: {{ ansible_hostname }}</p>
+            <p>This instance is part of a Managed Instance Group.</p>
+          </body>
+          </html>
+        dest: /var/www/html/index.html
+        mode: '0644'
